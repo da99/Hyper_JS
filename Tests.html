@@ -127,7 +127,7 @@ test("append: runs .trigger('update')", function () {
 
 test('prepend: accepts an array of objects', function () {
   list.prepend([{name: "123", job: "numbers"}, {name:"456", job: "numbers"}]);
-  assert.deepEqual(["456", "123"], [$('#list li').first().text(), $($('#list li')[1]).text()]);
+  assert.deepEqual(["123", "456"], [$('#list li').first().text(), $($('#list li')[1]).text()]);
 });
 
 test("prepend: adds element to top", function () {

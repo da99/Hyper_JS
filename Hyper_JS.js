@@ -48,6 +48,7 @@ Hyper_JS.prototype.into_dom = function (obj, pos, func) {
   var me       = this;
 
   if ($.isArray(obj)) {
+    var list = (pos === 'prepend') ? obj.reverse() : obj;
     $(obj).each(function (i, o) { me.into_dom(o, pos, func); });
     return me;
   }
