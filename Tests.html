@@ -125,13 +125,23 @@ test("prepend: runs .trigger('update')", function () {
 });
 
 
-test("pop: runs .trigger('empty') if last element is popped", function () {
+test("pop: runs .trigger('empty') if last element is pop-ed", function () {
   $('#list_2nd').empty();
   var events = [];
   var list = Hyper_JS.new('#list_2nd', function () { return '<li>text</li>'; }, []);
   list.append({name: "Wally", job: 'lay about'});
   list.on('empty', function () { events.push('now empty'); });
   list.pop();
+  assert('now empty', events[0]);
+});
+
+test("shift: runs .trigger('empty') if last element is shift-ed", function () {
+  $('#list_2nd').empty();
+  var events = [];
+  var list = Hyper_JS.new('#list_2nd', function () { return '<li>text</li>'; }, []);
+  list.append({name: "Wally", job: 'lay about'});
+  list.on('empty', function () { events.push('now empty'); });
+  list.shift();
   assert('now empty', events[0]);
 });
 

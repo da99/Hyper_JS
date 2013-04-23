@@ -22,6 +22,15 @@ Hyper_JS.new = function (selector, func, opt_arr) {
 };
 
 
+Hyper_JS.prototype.shift = function () {
+  var me = this;
+  if (!me.items.length)
+    return me;
+  me.items.shift();
+  me.updated($(me.list).first().remove(), 'shift');
+  return me;
+};
+
 Hyper_JS.prototype.pop = function () {
   var me = this;
   if (!me.items.length)
