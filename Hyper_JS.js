@@ -23,23 +23,24 @@ Hyper_JS.new = function (selector, func, opt_arr) {
 
 
 Hyper_JS.prototype.shift = function () {
-  var me = this;
-  if (!me.items.length)
-    return me;
-  me.items.shift();
-  me.updated($(me.list).children().first().remove(), 'shift');
-  return me;
+  return this.remove('first');
 };
 
 Hyper_JS.prototype.pop = function () {
+  return this.remove('last');
+};
+
+Hyper_JS.prototype.remove = function (pos) {
   var me = this;
   if (!me.items.length)
     return me;
-  me.items.pop();
-  me.updated($(me.list).children().last().remove(), 'pop');
+  if (pos === 'first')
+    me.items.shift();
+  if (pos === 'last')
+    me.items.pop();
+  me.updated($(me.list).children()[pos]().remove(), 'remove_' + pos);
   return me;
 };
-
 Hyper_JS.prototype.prepend = function (o, func) {
   return this.into_dom(o, 'prepend', func);
 };
