@@ -70,13 +70,14 @@ Hyper_JS.prototype.into_dom = function (obj, pos, func) {
   if (was_empty)
     me.updated(ele, pos, 'no-empty');
   else
-    me.updated(ele, pos, 'update');
+    me.updated(ele, pos);
 };
 
 
 Hyper_JS.prototype.updated = function (ele, pos, name) {
 
-
+  var update = 'update';
+  name = name || update;
   var me   = this;
   var args = {list: me, el: ele, pos: pos};
   $(me.afters).each(function (i, f) {
@@ -88,8 +89,8 @@ Hyper_JS.prototype.updated = function (ele, pos, name) {
 
   me.trigger(name, args);
 
-  if (name !== 'update')
-    me.trigger('update', args);
+  if (name != update)
+    me.trigger(update, args);
 
   return args;
 };
