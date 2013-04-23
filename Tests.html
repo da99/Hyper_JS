@@ -21,7 +21,7 @@
   </div>
   <div id="results" onclick="window.location.reload();">
   </div>
-    <script src="https://raw.github.com/Jxck/assert/master/assert.js"></script>
+    <script src="https://raw.github.com/rowanmanning/proclaim/master/lib/proclaim.js"></script>
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script src="http://underscorejs.org/underscore-min.js"></script>
     <script src="http://backbonejs.org/backbone-min.js"></script>
@@ -53,8 +53,6 @@ function error(name, act) {
   $('#results').append('<div class="failed">' + span(act) + '<br /> ' + name + '</div>');
 }
 
-var o_assert = assert;
-
 function assert (exp, act, name) {
   if (exp === act)
     passed(name || test_name, exp, act);
@@ -62,6 +60,16 @@ function assert (exp, act, name) {
     failed(name || test_name, exp, act)
 
 }
+
+assert.deepEqual = function (a, b, name) {
+  name = name || test_name;
+  try {
+    proclaim.deepEqual(a, b);
+    passed(name, a, b);
+  } catch (e) {
+    error(name, e);
+  }
+};
 
 window.onerror = function (msg, file, line) {
   error(msg, file + ':' + line);
@@ -85,7 +93,7 @@ test("append: runs .trigger('no-empty') if list was previously empty", function 
   var events = [];
   list.on('no-empty', function () { events.push('no longer empty'); });
   list.append({name: "Konrad Zuze", job: "genius"});
-  assert("no longer empty", events[0]);
+  assert.deepEqual(["no longer empty"], events);
 });
 
 test("append: adds element to bottom", function () {
@@ -103,7 +111,7 @@ test("append: runs .trigger('update')", function () {
   });
   list.append({name: "David Talbott", job: "genius"});
   list.off('update');
-  assert("new push", events[0]);
+  assert.deepEqual(["new push"], events);
 });
 
 test("prepend: adds element to top", function () {
@@ -124,7 +132,7 @@ test("prepend: runs .trigger('update')", function () {
   list.off('update');
 
 
-  assert("new unshift", events[0]);
+  assert.deepEqual(["new unshift"], events);
 });
 
 
