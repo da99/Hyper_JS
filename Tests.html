@@ -78,7 +78,7 @@ test(".new: saves html to .template", function () {
   assert('<li>{name}</li>', $.trim(list.template));
 });
 
-test("append: runs .trigger('no-empty')", function () {
+test("append: runs .trigger('no-empty') if list was previously empty", function () {
   var events = [];
   list.on('no-empty', function () { events.push('no longer empty'); });
   list.append({name: "Konrad Zuze", job: "genius"});
@@ -122,6 +122,17 @@ test("prepend: runs .trigger('update')", function () {
 
 
   assert("new unshift", events[0]);
+});
+
+
+test("pop: runs .trigger('empty') if last element is popped", function () {
+  $('#list_2nd').empty();
+  var events = [];
+  var list = Hyper_JS.new('#list_2nd', function () { return '<li>text</li>'; }, []);
+  list.append({name: "Wally", job: 'lay about'});
+  list.on('empty', function () { events.push('now empty'); });
+  list.pop();
+  assert('now empty', events[0]);
 });
 
 

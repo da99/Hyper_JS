@@ -24,6 +24,8 @@ Hyper_JS.new = function (selector, func, opt_arr) {
 
 Hyper_JS.prototype.pop = function () {
   var me = this;
+  if (!me.items.length)
+    return me;
   me.items.pop();
   me.updated($(me.list).last().remove(), 'pop');
   return me;
@@ -56,19 +58,23 @@ Hyper_JS.prototype.into_dom = function (obj, pos, func) {
   }
 
   if (was_empty)
-    me.trigger('no-empty', {list: me, el: ele, pos: pos});
+    me.updated(ele, pos, 'no-empty');
   me.updated(ele, pos);
 };
 
 
-Hyper_JS.prototype.updated = function (ele, pos) {
+Hyper_JS.prototype.updated = function (ele, pos, name) {
+  name = name || 'update';
   var me   = this;
   var args = {list: me, el: ele, pos: pos};
   $(me.afters).each(function (i, f) {
     f(args);
   });
 
-  me.trigger('update', args);
+  if (!me.items.length)
+    me.trigger('empty', args);
+
+  me.trigger(name, args);
 
   return args;
 };
