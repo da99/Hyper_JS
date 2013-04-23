@@ -51,6 +51,10 @@ function assert (exp, act, name) {
 
 }
 
+window.onerror = function (msg, file, line) {
+  error(msg, file + ':' + line);
+}
+
 var template = function (o) {
   return "<li>" + o.obj.name + "</li>";
 };
