@@ -5,17 +5,32 @@ _.extend(Hyper_JS, Backbone.Events);
 
 Hyper_JS.new = function (selector, func) {
   var o = new Hyper_JS();
-  o.list = selector;
+  o.list  = selector;
   o.items = [];
-  o.func = func;
+  o.func  = func;
   o.template = $(selector).html();
+  o.model = $($.trim(o.template || "")).attr('model');
   $(selector).empty();
 
   Hyper_JS.trigger('new', Hyper_JS);
   _.extend(o, Backbone.Events);
+
+  if (o.model && Hyper_JS.app()) {
+    Hyper_JS.app().on('new:' + o.model, function () {});
+    Hyper_JS.app().on('update:' + o.model, function () {});
+    Hyper_JS.app().on('trash:' + o.model, function () {});
+    Hyper_JS.app().on('untrash:' + o.model, function () {});
+    Hyper_JS.app().on('delete:' + o.model, function () {});
+  }
+
   return o;
 };
 
+Hyper_JS.app = function (app) {
+  if (arguments.length)
+    this._app_ = app;
+  return this._app_;
+};
 
 Hyper_JS.prototype.shift = function () {
   return this.remove('first');

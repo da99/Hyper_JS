@@ -13,7 +13,7 @@
   <body>
   <div id="stage">
     <ul id="list" list="prepend life">
-      <li>{name}</li>
+      <li model="genius">{name}</li>
     </ul>
     <ul id="list_2nd" list="append life">
       <li>{name}</li>
@@ -81,14 +81,32 @@ var template = function (o) {
   return "<li>" + o.obj.name + "</li>";
 };
 
+var App = {
+  events : [],
+  on : function (name, func) {
+    this.events.push([name, func]);
+  }
+};
+
+Hyper_JS.app(App);
 var list = Hyper_JS.new("#list", template);
+
+// ==== new
+
+test(".new: adds model events to App", function () {
+  assert.deepEqual(['new:genius',
+    'update:genius',
+    'trash:genius',
+    'untrash:genius',
+    'delete:genius'], _.pluck(App.events, 0));
+});
 
 test(".new: emptys element containing models", function () {
   assert(0, $('#list').children().length);
 });
 
 test(".new: saves html to .template", function () {
-  assert('<li>{name}</li>', $.trim(list.template));
+  assert('<li model="genius">{name}</li>', $.trim(list.template));
 });
 
 // ==== append
