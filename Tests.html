@@ -11,7 +11,9 @@
   </head>
   <body>
   <div id="stage">
-    <ul id="list"></ul>
+    <ul id="list">
+      <li>{name}</li>
+    </ul>
   </div>
   <div id="results" onclick="window.location.reload();">
   </div>
@@ -31,16 +33,20 @@ function test (name, func) {
   }
 }
 
+function span(txt) {
+  return '<span>' + (txt + '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>';
+}
 function passed(name, exp, act) {
-  $('#results').append('<div class="passed">' + exp + ' === ' + act + '<br /> ' + name + '</div>');
+  $('#results').append('<div class="passed">' + span(exp) + ' === ' + span(act) + '<br /> ' + name + '</div>');
 }
 
 function failed(name, exp, act) {
-  $('#results').append('<div class="failed">' + exp + ' === ' + act + '<br /> ' + name + '</div>');
+  console.log(span(exp))
+  $('#results').append('<div class="failed">' + span(exp) + ' === ' + span(act) + '<br /> ' + name + '</div>');
 }
 
 function error(name, act) {
-  $('#results').append('<div class="failed">' + act + '<br /> ' + name + '</div>');
+  $('#results').append('<div class="failed">' + span(act) + '<br /> ' + name + '</div>');
 }
 
 function assert (exp, act, name) {
@@ -60,6 +66,14 @@ var template = function (o) {
 };
 
 var list = Hyper_JS.new("#list", template, []);
+
+test(".new: emptys element containing models", function () {
+  assert(0, $('#list').children().length);
+});
+
+test(".new: saves html to .template", function () {
+  assert('<li>{name}</li>', list.template);
+});
 
 test("append: runs .trigger('no-empty')", function () {
   var events = [];
