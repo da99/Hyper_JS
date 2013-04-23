@@ -27,3 +27,16 @@ In your HTML:
 
     <script src="../path/to/jQuery"></script>
     <script src="./Hyper_JS.js" type="text/javascript"></script>
+
+
+Running Tests:
+=============
+
+     git clone git://github.com/da99/Hyper_JS.git
+     cd Hyper_JS
+     # open file in your browser: Tests.html
+
+
+
+
+

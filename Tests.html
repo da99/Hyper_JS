@@ -4,7 +4,7 @@
     <title>Tests for Hyper_JS</title>
     <style>
       body { background: #F0F0F0; }
-      #results div { padding: 3px 9px; }
+      #results div { padding: 10px ; margin-bottom: 5px; }
       div.passed { background: #CFDB00; }
       div.failed { background: #DB0013; }
     </style>
@@ -59,11 +59,17 @@ var list = Hyper_JS.new("#list", template, []);
 test("append: adds element to bottom", function () {
   list.append({name: "Ted Nelson", job: "genius"});
   assert("Ted Nelson", $('#list li').last().text());
+
+  list.append({name: "Michael Faraday", job: "genius"});
+  assert("Michael Faraday", $('#list li').last().text());
 });
 
 test("prepend: adds element to top", function () {
   list.prepend({name: "Alan Kay", job: "genius"});
   assert("Alan Kay", $('#list li').first().text());
+
+  list.prepend({name: "Engelbart", job: "genius"});
+  assert("Engelbart", $('#list li').first().text());
 });
 
 
