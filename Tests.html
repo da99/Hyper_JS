@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tests for Hyper_JS</title>
+    <style>
+      body { background: #F0F0F0; }
+      #results div { padding: 3px 9px; }
+      div.passed { background: #CFDB00; }
+      div.failed { background: #DB0013; }
+    </style>
+  </head>
+  <body>
+  <div id="stage">
+    <ul id="list"></ul>
+  </div>
+  <div id="results" onclick="window.location.reload();">
+  </div>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="./Hyper_JS.js" type="text/javascript"></script>
+    <script>
+
+var test_name = null;
+function test (name, func) {
+  test_name = name;
+  try {
+    func();
+  } catch (e) {
+    error(name, e);
+  }
+}
+
+function passed(name, exp, act) {
+  $('#results').append('<div class="passed">' + exp + ' === ' + act + '<br /> ' + name + '</div>');
+}
+
+function failed(name, exp, act) {
+  $('#results').append('<div class="failed">' + exp + ' === ' + act + '<br /> ' + name + '</div>');
+}
+
+function error(name, act) {
+  $('#results').append('<div class="failed">' + act + '<br /> ' + name + '</div>');
+}
+
+function assert (exp, act, name) {
+  if (exp === act)
+    passed(name || test_name, exp, act);
+  else
+    failed(name || test_name, exp, act)
+
+}
+
+var template = function (o) {
+  return "<li>" + o.obj.name + "</li>";
+};
+
+var list = Hyper_JS.new("#list", template, []);
+
+
+test("append: adds element to bottom", function () {
+  list.append({name: "Ted Nelson", job: "genius"});
+  assert("Ted Nelson", $('#list li').last().text());
+});
+
+test("prepend: adds element to top", function () {
+  list.prepend({name: "Alan Kay", job: "genius"});
+  assert("Alan Kay", $('#list li').first().text());
+});
+
+
+    </script>
+<!-- setTimeout(function () { window.location.reload(); }, 1000); -->
+  </body>
+</html>
+
