@@ -36,10 +36,11 @@ Hyper_JS.prototype.append = function (o, func) {
 };
 
 Hyper_JS.prototype.into_dom = function (obj, pos, func) {
-  var me   = this;
-  func     = func || me.func;
-  var ele  = $(func({obj: obj, Hyper_JS: me}));
-  var item = {item: obj, func: func};
+  var me       = this;
+  func         = func || me.func;
+  var ele      = $(func({obj: obj, Hyper_JS: me}));
+  var item     = {item: obj, func: func};
+  var was_empty= $(me.list).children().length === 0;
 
   if (pos === 'append' || pos === 'prepend') {
     if (pos === 'append') {
@@ -52,6 +53,8 @@ Hyper_JS.prototype.into_dom = function (obj, pos, func) {
     throw new Error("Not ready to handle positiong: " + pos);
   }
 
+  if (was_empty)
+    me.trigger('no-empty', {list: me, el: ele, pos: pos});
   me.updated(ele, pos);
 };
 

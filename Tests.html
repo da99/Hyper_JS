@@ -3,10 +3,10 @@
   <head>
     <title>Tests for Hyper_JS</title>
     <style>
-      body { background: #F0F0F0; }
-      #results div { padding: 10px ; margin-bottom: 5px; }
-      div.passed { background: #CFDB00; }
-      div.failed { background: #DB0013; }
+      body { background: #F0F0F0; padding-bottom: 50px; }
+      #results div { padding: 10px ; margin-right: 5px; margin-bottom: 5px; }
+      div.passed { background: #CFDB00; float: left; }
+      div.failed { background: #DB0013; float: left; }
     </style>
   </head>
   <body>
@@ -57,6 +57,12 @@ var template = function (o) {
 
 var list = Hyper_JS.new("#list", template, []);
 
+test("append: runs .trigger('no-empty')", function () {
+  var events = [];
+  list.on('no-empty', function () { events.push('no longer empty'); });
+  list.append({name: "Konrad Zuze", job: "genius"});
+  assert("no longer empty", events[0]);
+});
 
 test("append: adds element to bottom", function () {
   list.append({name: "Ted Nelson", job: "genius"});
