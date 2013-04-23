@@ -8,7 +8,7 @@ model watching:
   * [Ember.js](http://emberjs.com)
   * [Rivets.js](http://rivetsjs.com)
   * [Knockout.js](http://knockoutjs.com)
-  * [Thorax.js](thoraxjs.org)
+  * [Thorax.js](http://thoraxjs.org)
   * ... and a million other alternatives.
 
 Dependencies
