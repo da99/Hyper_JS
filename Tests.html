@@ -63,11 +63,13 @@ function assert (exp, act, name) {
 
 assert.deepEqual = function (a, b, name) {
   name = name || test_name;
+  var j_a = JSON.stringify(a);
+  var j_b = JSON.stringify(b);
   try {
     proclaim.deepEqual(a, b);
-    passed(name, a, b);
+    passed(name, j_a, j_b);
   } catch (e) {
-    error(name, a + ' !== ' + b);
+    error(name, j_a + ' !== ' + j_b);
   }
 };
 
