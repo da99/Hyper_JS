@@ -12,10 +12,10 @@
   </head>
   <body>
   <div id="stage">
-    <ul id="list">
+    <ul id="list" list="prepend life">
       <li>{name}</li>
     </ul>
-    <ul id="list_2nd">
+    <ul id="list_2nd" list="append life">
       <li>{name}</li>
     </ul>
   </div>
@@ -81,7 +81,7 @@ var template = function (o) {
   return "<li>" + o.obj.name + "</li>";
 };
 
-var list = Hyper_JS.new("#list", template, []);
+var list = Hyper_JS.new("#list", template);
 
 test(".new: emptys element containing models", function () {
   assert(0, $('#list').children().length);
@@ -90,6 +90,8 @@ test(".new: emptys element containing models", function () {
 test(".new: saves html to .template", function () {
   assert('<li>{name}</li>', $.trim(list.template));
 });
+
+// ==== append
 
 test("append: runs .trigger('no-empty') if list was previously empty", function () {
   var events = [];
@@ -106,6 +108,11 @@ test("append: adds element to bottom", function () {
   assert("Michael Faraday", $('#list li').last().text());
 });
 
+test('append: accepts an array of objects', function () {
+  list.append([{name: "789", job: "numbers"}, {name:"012", job: "numbers"}]);
+  assert.deepEqual(["789", "012"], [$('#list li').slice(-2,-1).text(), $('#list li').last().text()]);
+});
+
 test("append: runs .trigger('update')", function () {
   var events = [];
   list.on('update', function () {
@@ -114,6 +121,13 @@ test("append: runs .trigger('update')", function () {
   list.append({name: "David Talbott", job: "genius"});
   list.off('update');
   assert.deepEqual(["new push"], events);
+});
+
+// ==== prepend
+
+test('prepend: accepts an array of objects', function () {
+  list.prepend([{name: "123", job: "numbers"}, {name:"456", job: "numbers"}]);
+  assert.deepEqual(["456", "123"], [$('#list li').first().text(), $($('#list li')[1]).text()]);
 });
 
 test("prepend: adds element to top", function () {
