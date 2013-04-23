@@ -27,7 +27,7 @@ Hyper_JS.prototype.shift = function () {
   if (!me.items.length)
     return me;
   me.items.shift();
-  me.updated($(me.list).first().remove(), 'shift');
+  me.updated($(me.list).children().first().remove(), 'shift');
   return me;
 };
 
@@ -36,7 +36,7 @@ Hyper_JS.prototype.pop = function () {
   if (!me.items.length)
     return me;
   me.items.pop();
-  me.updated($(me.list).last().remove(), 'pop');
+  me.updated($(me.list).children().last().remove(), 'pop');
   return me;
 };
 

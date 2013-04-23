@@ -135,6 +135,13 @@ test("pop: runs .trigger('empty') if last element is pop-ed", function () {
   assert('now empty', events[0]);
 });
 
+test('pop: removes element at bottom', function () {
+  var text = $('#list li').last().text();
+  list.append({name: "1", job: "genius"});
+  list.pop();
+  assert(text, $('#list li').last().text());
+});
+
 test("shift: runs .trigger('empty') if last element is shift-ed", function () {
   $('#list_2nd').empty();
   var events = [];
@@ -143,6 +150,13 @@ test("shift: runs .trigger('empty') if last element is shift-ed", function () {
   list.on('empty', function () { events.push('now empty'); });
   list.shift();
   assert('now empty', events[0]);
+});
+
+test('shift: removes element at top', function () {
+  var text = $('#list li').first().text();
+  var next = $($('#list li')[1]).text();
+  list.shift();
+  assert(next, $('#list li').first().text());
 });
 
 
