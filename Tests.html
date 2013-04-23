@@ -21,6 +21,7 @@
   </div>
   <div id="results" onclick="window.location.reload();">
   </div>
+    <script src="https://raw.github.com/Jxck/assert/master/assert.js"></script>
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script src="http://underscorejs.org/underscore-min.js"></script>
     <script src="http://backbonejs.org/backbone-min.js"></script>
@@ -51,6 +52,8 @@ function failed(name, exp, act) {
 function error(name, act) {
   $('#results').append('<div class="failed">' + span(act) + '<br /> ' + name + '</div>');
 }
+
+var o_assert = assert;
 
 function assert (exp, act, name) {
   if (exp === act)

@@ -38,7 +38,7 @@ Hyper_JS.prototype.remove = function (pos) {
     me.items.shift();
   if (pos === 'last')
     me.items.pop();
-  me.updated($(me.list).children()[pos]().remove(), 'remove_' + pos);
+  me.updated($(me.list).children()[pos]().remove(), pos, 'remove_' + pos);
   return me;
 };
 Hyper_JS.prototype.prepend = function (o, func) {
@@ -69,12 +69,14 @@ Hyper_JS.prototype.into_dom = function (obj, pos, func) {
 
   if (was_empty)
     me.updated(ele, pos, 'no-empty');
-  me.updated(ele, pos);
+  else
+    me.updated(ele, pos, 'update');
 };
 
 
 Hyper_JS.prototype.updated = function (ele, pos, name) {
-  name = name || 'update';
+
+
   var me   = this;
   var args = {list: me, el: ele, pos: pos};
   $(me.afters).each(function (i, f) {
@@ -85,6 +87,9 @@ Hyper_JS.prototype.updated = function (ele, pos, name) {
     me.trigger('empty', args);
 
   me.trigger(name, args);
+
+  if (name !== 'update')
+    me.trigger('update', args);
 
   return args;
 };
