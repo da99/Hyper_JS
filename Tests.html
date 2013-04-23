@@ -14,6 +14,9 @@
     <ul id="list">
       <li>{name}</li>
     </ul>
+    <ul id="list_2nd">
+      <li>{name}</li>
+    </ul>
   </div>
   <div id="results" onclick="window.location.reload();">
   </div>
@@ -41,7 +44,6 @@ function passed(name, exp, act) {
 }
 
 function failed(name, exp, act) {
-  console.log(span(exp))
   $('#results').append('<div class="failed">' + span(exp) + ' === ' + span(act) + '<br /> ' + name + '</div>');
 }
 
@@ -72,7 +74,7 @@ test(".new: emptys element containing models", function () {
 });
 
 test(".new: saves html to .template", function () {
-  assert('<li>{name}</li>', list.template);
+  assert('<li>{name}</li>', $.trim(list.template));
 });
 
 test("append: runs .trigger('no-empty')", function () {
@@ -121,11 +123,11 @@ test("prepend: runs .trigger('update')", function () {
   assert("new unshift", events[0]);
 });
 
-var events = [];
 
 test("Hyper_JS.on('new'): runs on .new call", function () {
+  var events = [];
   Hyper_JS.on('new', function (o) { events.push('created'); });
-  Hyper_JS.new('#list', function () {}, []);
+  Hyper_JS.new('#list_2nd', function () {}, []);
   assert("created", events[0]);
 })
 

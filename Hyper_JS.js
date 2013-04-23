@@ -8,6 +8,8 @@ Hyper_JS.new = function (selector, func, opt_arr) {
   o.list = selector;
   o.items = [];
   o.func = func;
+  o.template = $(selector).html();
+  $(selector).empty();
   if (opt_arr) {
     $(opt_arr).each(function (i, e) {
       o.push(e);
