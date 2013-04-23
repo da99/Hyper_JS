@@ -1,6 +1,7 @@
 "use strict";
 
 var Hyper_JS = function () {};
+_.extend(Hyper_JS, Backbone.Events);
 
 Hyper_JS.new = function (selector, func, opt_arr) {
   var o = new Hyper_JS();
@@ -13,6 +14,8 @@ Hyper_JS.new = function (selector, func, opt_arr) {
     });
   }
 
+  Hyper_JS.trigger('new', Hyper_JS);
+  _.extend(o, Backbone.Events);
   return o;
 };
 
@@ -59,6 +62,8 @@ Hyper_JS.prototype.updated = function (ele, pos) {
   $(me.afters).each(function (i, f) {
     f(args);
   });
+
+  me.trigger('update', args);
 
   return args;
 };

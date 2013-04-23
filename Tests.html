@@ -16,6 +16,8 @@
   <div id="results" onclick="window.location.reload();">
   </div>
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://underscorejs.org/underscore-min.js"></script>
+    <script src="http://backbonejs.org/backbone-min.js"></script>
     <script src="./Hyper_JS.js" type="text/javascript"></script>
     <script>
 
@@ -64,6 +66,16 @@ test("append: adds element to bottom", function () {
   assert("Michael Faraday", $('#list li').last().text());
 });
 
+test("append: runs .trigger('update')", function () {
+  var events = [];
+  list.on('update', function () {
+    events.push('new push');
+  });
+  list.append({name: "David Talbott", job: "genius"});
+  list.off('update');
+  assert("new push", events[0]);
+});
+
 test("prepend: adds element to top", function () {
   list.prepend({name: "Alan Kay", job: "genius"});
   assert("Alan Kay", $('#list li').first().text());
@@ -72,6 +84,26 @@ test("prepend: adds element to top", function () {
   assert("Engelbart", $('#list li').first().text());
 });
 
+test("prepend: runs .trigger('update')", function () {
+  var events = [];
+  list.on('update', function () {
+    events.push('new unshift');
+  });
+
+  list.prepend({name: "Wal Thornhill", job: "genius"});
+  list.off('update');
+
+
+  assert("new unshift", events[0]);
+});
+
+var events = [];
+
+test("Hyper_JS.on('new'): runs on .new call", function () {
+  Hyper_JS.on('new', function (o) { events.push('created'); });
+  Hyper_JS.new('#list', function () {}, []);
+  assert("created", events[0]);
+})
 
     </script>
 <!-- setTimeout(function () { window.location.reload(); }, 1000); -->

@@ -2,7 +2,7 @@
 Intro:
 =====
 
-This is not useful to you. Instead,  the following for data binding and
+This is not useful to you. Instead, use the following for data binding and
 model watching:
 
   * [Ember.js](http://emberjs.com)
@@ -14,7 +14,9 @@ model watching:
 Dependencies
 ============
 
-jQuery 1.9.1 or higher.
+  * jQuery >= 1.9.1+
+  * Underscore >= 1.4.3
+  * Backbone >= 1.0.0
 
 Install:
 ========
