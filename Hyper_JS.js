@@ -1,5 +1,7 @@
 "use strict";
 
+// function error(name, e) { throw e;}
+
 var Hyper_JS = function () {};
 _.extend(Hyper_JS, Backbone.Events);
 
@@ -7,9 +9,20 @@ Hyper_JS.new = function (selector, models, func) {
   var o = new Hyper_JS();
   o.list     = selector;
   o.items    = [];
-  o.func     = func;
+  o.models   = [];
+  o.funcs    = {object: func};
+
   o.template = $(selector).html();
-  o.models   = _.uniq(_.compact(_.flatten([models])));
+
+  if (_.isObject(models) && !_.isArray(models)) {
+    _.each(models, function (f, m) {
+      o.func_for(m, f);
+      o.models.push(m);
+    });
+  } else {
+    o.models   = o.models.concat(_.uniq(_.compact(_.flatten([models]))));
+  }
+
   $(selector).empty();
 
   Hyper_JS.trigger('new', Hyper_JS);
@@ -18,11 +31,11 @@ Hyper_JS.new = function (selector, models, func) {
   if (Hyper_JS.app()) {
     _.each(o.models, function ( name, i ) {
       Hyper_JS.app().on('new:' + name, function (new_model) {
-        o.prepend(new_model);
+        o.prepend(new_model, null, name);
       });
 
       Hyper_JS.app().on('update:' + name, function (new_model) {
-        o.update_where('id', new_model);
+        o.update_where('id', new_model, name);
       });
 
       Hyper_JS.app().on('trash:' + name, function (new_model) {
@@ -46,6 +59,20 @@ Hyper_JS.app = function (app) {
   if (arguments.length)
     this._app_ = app;
   return this._app_;
+};
+
+Hyper_JS.prototype.func_for = function (name, func) {
+  var me = this;
+
+  if (_.isFunction(func)) {
+    this.funcs[name] = func;
+    return func;
+  }
+
+  return _.compact(_.map(arguments, function (name) {
+    return me.funcs[name];
+  }))[0] || this.funcs.object;
+
 };
 
 Hyper_JS.prototype.shift = function () {
@@ -90,7 +117,7 @@ Hyper_JS.prototype.find_pos_where = function (field, new_model) {
   var pos        = null;
 
   _.find(me.items, function (o, i) {
-    if (o.item[field] === target_val)
+    if (o[field] === target_val)
       pos = i;
 
     return pos !== null;
@@ -111,31 +138,30 @@ Hyper_JS.prototype.delete_where = function (field, new_model) {
   return me;
 };
 
-Hyper_JS.prototype.update_where = function (field, new_model) {
+Hyper_JS.prototype.update_where = function (field, new_model, type) {
   var me = this;
   var pos = me.find_pos_where(field, new_model);
 
   if (pos === null)
     return me.prepend(new_model);
 
-  var meta = me.items[pos];
-  meta.item = new_model;
+  me.items[pos] = new_model;
 
   me.el_at(pos)
-  .replaceWith(meta.func(new_model, me));
+  .replaceWith(me.func_for(new_model[field], type)(new_model, me));
 
   return me;
 };
 
-Hyper_JS.prototype.prepend = function (o, func) {
-  return this.into_dom(o, 'prepend', func);
+Hyper_JS.prototype.prepend = function (o, func, type) {
+  return this.into_dom(o, 'prepend', func, type);
 };
 
-Hyper_JS.prototype.append = function (o, func) {
-  return this.into_dom(o, 'append', func);
+Hyper_JS.prototype.append = function (o, func, type) {
+  return this.into_dom(o, 'append', func, type);
 };
 
-Hyper_JS.prototype.into_dom = function (obj, pos, func) {
+Hyper_JS.prototype.into_dom = function (obj, pos, func, type) {
   var me       = this;
 
   if ($.isArray(obj)) {
@@ -144,16 +170,16 @@ Hyper_JS.prototype.into_dom = function (obj, pos, func) {
     return me;
   }
 
-  func         = func || me.func;
-  var ele      = $(func(obj, me));
-  var item     = {item: obj, func: func};
+  if (func)
+    me.func_for(obj.id, func);
+  var ele      = $(me.func_for(obj.id, type)(obj, me));
   var was_empty= $(me.list).children().length === 0;
 
   if (pos === 'append' || pos === 'prepend') {
     if (pos === 'append') {
-      me.items.push(item);
+      me.items.push(obj);
     } else {
-      me.items.unshift(item);
+      me.items.unshift(obj);
     }
     $(me.list)[pos](ele);
   } else {
