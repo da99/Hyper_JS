@@ -26,7 +26,7 @@ var App = {
 };
 
 Hyper_JS.app(App);
-var list = Hyper_JS.new("#list", template);
+var list = Hyper_JS.new("#list", 'genius', template);
 
 // ==== new
 
@@ -103,7 +103,7 @@ test("prepend: runs .trigger('update')", function () {
 test("pop: runs .trigger('empty') if last element is pop-ed", function () {
   $('#list_2nd').empty();
   var events = [];
-  var list = Hyper_JS.new('#list_2nd', function () { return '<li>text</li>'; }, []);
+  var list = Hyper_JS.new('#list_2nd', null, function () { return '<li>text</li>'; }, []);
   list.append({name: "Wally", job: 'lay about'});
   list.on('empty', function () { events.push('now empty'); });
   list.pop();
@@ -120,7 +120,7 @@ test('pop: removes element at bottom', function () {
 test("shift: runs .trigger('empty') if last element is shift-ed", function () {
   $('#list_2nd').empty();
   var events = [];
-  var list = Hyper_JS.new('#list_2nd', function () { return '<li>text</li>'; }, []);
+  var list = Hyper_JS.new('#list_2nd', null, function () { return '<li>text</li>'; }, []);
   list.append({name: "Wally", job: 'lay about'});
   list.on('empty', function () { events.push('now empty'); });
   list.shift();
@@ -138,7 +138,7 @@ test('shift: removes element at top', function () {
 test("Hyper_JS.on('new'): runs on .new call", function () {
   var events = [];
   Hyper_JS.on('new', function (o) { events.push('created'); });
-  Hyper_JS.new('#list_2nd', function () {}, []);
+  Hyper_JS.new('#list_2nd', null, function () {}, []);
   assert("created", events[0]);
 })
 

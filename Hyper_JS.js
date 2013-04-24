@@ -3,37 +3,39 @@
 var Hyper_JS = function () {};
 _.extend(Hyper_JS, Backbone.Events);
 
-Hyper_JS.new = function (selector, func) {
+Hyper_JS.new = function (selector, models, func) {
   var o = new Hyper_JS();
-  o.list  = selector;
-  o.items = [];
-  o.func  = func;
+  o.list     = selector;
+  o.items    = [];
+  o.func     = func;
   o.template = $(selector).html();
-  o.model = $($.trim(o.template || "")).attr('model');
+  o.models   = _.uniq(_.compact(_.flatten([models])));
   $(selector).empty();
 
   Hyper_JS.trigger('new', Hyper_JS);
   _.extend(o, Backbone.Events);
 
-  if (o.model && Hyper_JS.app()) {
-    Hyper_JS.app().on('new:' + o.model, function (new_model) {
-      o.prepend(new_model);
-    });
+  if (Hyper_JS.app()) {
+    _.each(o.models, function ( name, i ) {
+      Hyper_JS.app().on('new:' + name, function (new_model) {
+        o.prepend(new_model);
+      });
 
-    Hyper_JS.app().on('update:' + o.model, function (new_model) {
-      o.update_where('id', new_model);
-    });
+      Hyper_JS.app().on('update:' + name, function (new_model) {
+        o.update_where('id', new_model);
+      });
 
-    Hyper_JS.app().on('trash:' + o.model, function (new_model) {
-      o.trash_where('id', new_model);
-    });
+      Hyper_JS.app().on('trash:' + name, function (new_model) {
+        o.trash_where('id', new_model);
+      });
 
-    Hyper_JS.app().on('untrash:' + o.model, function (new_model) {
-      o.untrash_where('id', new_model);
-    });
+      Hyper_JS.app().on('untrash:' + name, function (new_model) {
+        o.untrash_where('id', new_model);
+      });
 
-    Hyper_JS.app().on('delete:' + o.model, function (new_model) {
-      o.delete_where('id', new_model);
+      Hyper_JS.app().on('delete:' + name, function (new_model) {
+        o.delete_where('id', new_model);
+      });
     });
   }
 
