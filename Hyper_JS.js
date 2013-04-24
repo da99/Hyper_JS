@@ -31,7 +31,7 @@ Hyper_JS.new = function (selector, models, func) {
   if (Hyper_JS.app()) {
     _.each(o.models, function ( name, i ) {
       Hyper_JS.app().on('new:' + name, function (new_model) {
-        o.prepend(new_model, null, name);
+        o.prepend(new_model, name);
       });
 
       Hyper_JS.app().on('update:' + name, function (new_model) {
