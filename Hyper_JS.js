@@ -25,11 +25,11 @@ Hyper_JS.new = function (selector, func) {
     });
 
     Hyper_JS.app().on('trash:' + o.model, function (new_model) {
-      $(o.find_where('id', new_model)).addClass('trashed');
+      o.trash_where('id', new_model);
     });
 
     Hyper_JS.app().on('untrash:' + o.model, function (new_model) {
-      $(o.find_where('id', new_model)).removeClass('untrashed');
+      o.untrash_where('id', new_model);
     });
 
     Hyper_JS.app().on('delete:' + o.model, function (new_model) {
@@ -63,6 +63,26 @@ Hyper_JS.prototype.remove = function (pos) {
   if (pos === 'last')
     me.items.pop();
   me.updated($(me.list).children()[pos]().remove(), pos, 'remove_' + pos);
+  return me;
+};
+
+Hyper_JS.prototype.trash_where = function (field, new_model) {
+  var me = this;
+  var pos = me.find_where('id', new_model);
+  if (pos < 0)
+    return me;
+
+  $($(me.list).children()[pos]).addClass('trashed');
+  return me;
+};
+
+Hyper_JS.prototype.untrash_where = function (field, new_model) {
+  var me = this;
+  var pos = me.find_where('id', new_model);
+  if (pos < 0)
+    return me;
+
+  $($(me.list).children()[pos]).removeClass('trashed');
   return me;
 };
 
