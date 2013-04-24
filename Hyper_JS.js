@@ -16,10 +16,16 @@ Hyper_JS.new = function (selector, func) {
   _.extend(o, Backbone.Events);
 
   if (o.model && Hyper_JS.app()) {
-    Hyper_JS.app().on('new:' + o.model, function () {});
+    Hyper_JS.app().on('new:' + o.model, function (new_model) {
+      o.prepend(new_model);
+    });
+
     Hyper_JS.app().on('update:' + o.model, function () {});
+
     Hyper_JS.app().on('trash:' + o.model, function () {});
+
     Hyper_JS.app().on('untrash:' + o.model, function () {});
+
     Hyper_JS.app().on('delete:' + o.model, function () {});
   }
 

@@ -83,8 +83,14 @@ var template = function (o) {
 
 var App = {
   events : [],
+  events_map : {},
+  trigger : function (name, o) {
+    this.events_map[name](o);
+    return this;
+  },
   on : function (name, func) {
     this.events.push([name, func]);
+    this.events_map[name] = func;
   }
 };
 
@@ -93,14 +99,6 @@ var list = Hyper_JS.new("#list", template);
 
 // ==== new
 
-test(".new: adds model events to App", function () {
-  assert.deepEqual(['new:genius',
-    'update:genius',
-    'trash:genius',
-    'untrash:genius',
-    'delete:genius'], _.pluck(App.events, 0));
-});
-
 test(".new: emptys element containing models", function () {
   assert(0, $('#list').children().length);
 });
@@ -108,6 +106,7 @@ test(".new: emptys element containing models", function () {
 test(".new: saves html to .template", function () {
   assert('<li model="genius">{name}</li>', $.trim(list.template));
 });
+
 
 // ==== append
 
@@ -211,6 +210,52 @@ test("Hyper_JS.on('new'): runs on .new call", function () {
   Hyper_JS.new('#list_2nd', function () {}, []);
   assert("created", events[0]);
 })
+
+// ==== events
+
+test("adds model events to App", function () {
+  assert.deepEqual(['new:genius',
+    'update:genius',
+    'trash:genius',
+    'untrash:genius',
+    'delete:genius'], _.pluck(App.events, 0));
+});
+
+test('new:model prepends model to list', function () {
+  App.trigger('new:genius', {id: 'one', name: 'Uno', job: 'num'});
+  assert('Uno', $('#list li').first().text());
+});
+
+test('update:model updates model', function () {
+  App.trigger('update:genius', {id: 'one', name: 'Dos', job: 'num'});
+  assert('Dos', $('#list li').first().text());
+});
+
+test('trash:model adds class "trashed"', function () {
+  App.trigger('trash:genius', {id: 'one'});
+  assert('trashed', $('#list li').first().attr('class'));
+});
+
+test('untrash:model removes class "trashed"', function () {
+  App.trigger('untrash:genius', {id: 'one'});
+  assert('', $('#list li').first().attr('class'));
+});
+
+test('delete:model removes element from list', function () {
+  var name = "Two_2456";
+  list.prepend({id: name, name: name, job: "two"});
+  App.trigger('delete:genius', {id: name});
+  assert(0, $('#list li').filter(function () { return $(this).text() === name; }).length);
+});
+
+test('delete:model removes element from list.items', function () {
+  var name = "Two_20";
+  var o_size = list.items.length;
+  list.prepend({id: name, name: name, job: "two"});
+  App.trigger('delete:genius', {id: name});
+  assert(o_size - 1, list.items.length);
+});
+
 
     </script>
 <!-- setTimeout(function () { window.location.reload(); }, 1000); -->
