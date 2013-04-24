@@ -8,31 +8,56 @@
 
 
 var Hyper_JS = function () {};
+
 _.extend(Hyper_JS, Backbone.Events);
 
+Hyper_JS.default_func = function (o) { return null; };
+
+Hyper_JS.app = function (app) {
+  if (arguments.length)
+    this._app_ = app;
+  return this._app_;
+};
+
 Hyper_JS.new = function (selector, models, func) {
-  var o = new Hyper_JS();
-  o.list     = selector;
-  o.items    = [];
-  o.models   = [];
-  o.funcs    = {object: (func || function () { return null; })};
-
-  o.template = $(selector).html();
-
-  if (_.isObject(models) && !_.isArray(models)) {
-    _.each(models, function (f, m) {
-      o.func_for(m, f);
-      o.models.push(m);
-    });
-  } else {
-    o.models   = o.models.concat(_.uniq(_.compact(_.flatten([models]))));
+  if (arguments.length === 2 && _.isString(selector) && _.isFunction(models)) {
+    models   = selector;
+    func     = models;
+    selector = null;
   }
 
-  $(selector).empty();
+  if (arguments.length === 1) {
+    models = selector;
+    selector = null;
+  }
 
-  Hyper_JS.trigger('new', Hyper_JS);
+  var o = new Hyper_JS();
   _.extend(o, Backbone.Events);
+  o.list     = selector;
+  o.items    = [];
+  o.models   = null;
+  o.funcs    = {object: Hyper_JS.default_func};
 
+
+  if (_.isFunction(func))
+    o.func.object = func;
+
+  if (selector) {
+    o.template = $(selector).html();
+    $(selector).empty();
+  }
+
+  if (_.isObject(models) && !_.isArray(models)) {
+    _.extend(o.funcs, models);
+    models = _.keys(models);
+  }
+
+  o.models = _.uniq(_.compact(_.flatten([models])));
+
+  // === broadcast the birth of this object.
+  Hyper_JS.trigger('new', o);
+
+  // === setup notifys.
   if (Hyper_JS.app()) {
     _.each(o.models, function ( name, i ) {
       Hyper_JS.app().on('new:' + name, function (new_model) {
@@ -40,7 +65,7 @@ Hyper_JS.new = function (selector, models, func) {
       });
 
       Hyper_JS.app().on('update:' + name, function (new_model) {
-        o.update_where('id', new_model, name);
+        o.update_where('id', new_model);
       });
 
       Hyper_JS.app().on('trash:' + name, function (new_model) {
@@ -60,12 +85,6 @@ Hyper_JS.new = function (selector, models, func) {
   return o;
 };
 
-Hyper_JS.app = function (app) {
-  if (arguments.length)
-    this._app_ = app;
-  return this._app_;
-};
-
 
 // ================================================================
 // === meta/find stuff
@@ -76,13 +95,13 @@ Hyper_JS.prototype.el_at = function (pos) {
   return $($(this.list).children()[pos]);
 };
 
-Hyper_JS.prototype.find_pos_where = function (field, new_model) {
+Hyper_JS.prototype.item_where = function (field, new_model) {
   var me         = this;
-  var target_val = $.isPlainObject(new_model) ? new_model[field] : new_mode;
+  var target_val = $.isPlainObject(new_model) ? new_model[field] : new_model;
   var pos        = null;
 
   _.find(me.items, function (o, i) {
-    if (o[field] === target_val)
+    if (o.data[field] === target_val)
       pos = i;
 
     return pos !== null;
@@ -91,66 +110,58 @@ Hyper_JS.prototype.find_pos_where = function (field, new_model) {
   return pos;
 };
 
-Hyper_JS.prototype.func_for = function (name, func) {
+Hyper_JS.prototype.func_at = function (pos) {
   var me = this;
-
-  if (_.isFunction(func)) {
-    this.funcs[name] = func;
-    return func;
-  }
-
-  return _.compact(_.map(arguments, function (name) {
-    return me.funcs[name];
-  }))[0] || this.funcs.object;
-
+  return me.items[pos].func;
 };
 
 // ================================================================
 // === create/new
 // ================================================================
 
-Hyper_JS.prototype.prepend = function (o, func, type) {
-  return this.into_dom(o, 'prepend', func, type);
-};
-
-Hyper_JS.prototype.append = function (o, func, type) {
-  return this.into_dom(o, 'append', func, type);
-};
-
-Hyper_JS.prototype.into_dom = function (obj, pos, func, type) {
+Hyper_JS.prototype.insert = function (obj, func) {
   var me       = this;
-
-  if (_.isString(func)) {
-    type = func;
-    func = null;
-  }
-
   if ($.isArray(obj)) {
-    var list = (pos === 'prepend') ? obj.reverse() : obj;
-    $(obj).each(function (i, o) { me.into_dom(o, pos, func); });
+    _.each(obj, function (o) { me.insert(o, func); });
     return me;
   }
 
-  if (func)
-    me.func_for(obj.id, func);
-  var ele      = $(me.func_for(obj.id, type)(obj, me));
-  var was_empty= $(me.list).children().length === 0;
+  var item = {data: obj};
+  var pos  = 'top';
 
-  if (pos === 'append' || pos === 'prepend') {
-    if (pos === 'append') {
-      me.items.push(obj);
-    } else {
-      me.items.unshift(obj);
-    }
-    $(me.list)[pos](ele);
-  } else {
-    throw new Error("Not ready to handle positiong: " + pos);
+  if (_.isString(func)) {
+    item.model = func;
+    item.func  = me.funcs[func];
   }
 
-  if (was_empty)
-    me.updated(ele, pos, 'no-empty');
-  else
-    me.updated(ele, pos);
+  if (_.isFunction(func))
+    item.func = func;
+
+  if (!item.func)
+    item.func  = me.funcs.object;
+
+  var ele = item.func(obj, me);
+
+  if (_.isArray(ele)) {
+    pos = ele[0];
+    ele = ele[1];
+  }
+
+  if ( !_.contains(['top', 'bottom'], pos) )
+    throw new Error("Not ready to handle positiong: " + pos);
+
+  (pos === 'top') ?
+    me.items.unshift(obj) :
+    me.items.push(obj);
+
+  if (!ele)
+    return me;
+
+  ele = $(ele);
+
+  $(me.list)[(pos === 'top') ? 'prepend' : 'append'](ele);
+
+  return me;
 };
 
 
@@ -158,40 +169,20 @@ Hyper_JS.prototype.into_dom = function (obj, pos, func, type) {
 // === update
 // ================================================================
 
-Hyper_JS.prototype.update_where = function (field, new_model, type) {
+Hyper_JS.prototype.update_where = function (field, new_model) {
   var me = this;
-  var pos = me.find_pos_where(field, new_model);
+  var pos = me.item_where(field, new_model);
 
   if (pos === null)
-    return me.prepend(new_model);
+    return me;
 
-  me.items[pos] = new_model;
+  var meta = me.items[pos];
+  meta.data = new_model;
 
   me.el_at(pos)
-  .replaceWith(me.func_for(new_model[field], type)(new_model, me));
+  .replaceWith(meta.func(new_model, me));
 
   return me;
-};
-
-Hyper_JS.prototype.updated = function (ele, pos, name) {
-
-  var update = 'update';
-  name = name || update;
-  var me   = this;
-  var args = {list: me, el: ele, pos: pos};
-  $(me.afters).each(function (i, f) {
-    f(args);
-  });
-
-  if (!me.items.length)
-    me.trigger('empty', args);
-
-  me.trigger(name, args);
-
-  if (name != update)
-    me.trigger(update, args);
-
-  return args;
 };
 
 
@@ -202,13 +193,13 @@ Hyper_JS.prototype.updated = function (ele, pos, name) {
 
 Hyper_JS.prototype.trash_where = function (field, new_model) {
   var me = this;
-  me.el_at(me.find_pos_where('id', new_model)).addClass('trashed');
+  me.el_at(me.item_where('id', new_model)).addClass('trashed');
   return me;
 };
 
 Hyper_JS.prototype.untrash_where = function (field, new_model) {
   var me = this;
-  me.el_at(me.find_pos_where('id', new_model)).removeClass('trashed');
+  me.el_at(me.item_where('id', new_model)).removeClass('trashed');
   return me;
 };
 
@@ -227,26 +218,31 @@ Hyper_JS.prototype.pop = function () {
 
 Hyper_JS.prototype.remove = function (pos) {
   var me = this;
+
   if (!me.items.length)
     return me;
   if (pos === 'first')
     me.items.shift();
-  if (pos === 'last')
+  else if (pos === 'last')
     me.items.pop();
-  me.updated($(me.list).children()[pos]().remove(), pos, 'remove_' + pos);
+
+  if (pos === 'first' || pos === 'last')
+    $(me.list).children()[pos]().remove();
+
   return me;
 };
 
 Hyper_JS.prototype.delete_where = function (field, new_model) {
 
   var me = this;
-  var pos = me.find_pos_where(field, new_model);
+  var pos = me.item_where(field, new_model);
   if (pos === null)
     return me;
 
   me.items.splice(pos, 1);
   me.el_at(pos).remove();
   return me;
+
 };
 
 
