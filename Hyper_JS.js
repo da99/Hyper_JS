@@ -2,6 +2,11 @@
 
 // function error(name, e) { throw e;}
 
+// ================================================================
+// === Main Stuff
+// ================================================================
+
+
 var Hyper_JS = function () {};
 _.extend(Hyper_JS, Backbone.Events);
 
@@ -61,51 +66,11 @@ Hyper_JS.app = function (app) {
   return this._app_;
 };
 
-Hyper_JS.prototype.func_for = function (name, func) {
-  var me = this;
 
-  if (_.isFunction(func)) {
-    this.funcs[name] = func;
-    return func;
-  }
+// ================================================================
+// === meta/find stuff
+// ================================================================
 
-  return _.compact(_.map(arguments, function (name) {
-    return me.funcs[name];
-  }))[0] || this.funcs.object;
-
-};
-
-Hyper_JS.prototype.shift = function () {
-  return this.remove('first');
-};
-
-Hyper_JS.prototype.pop = function () {
-  return this.remove('last');
-};
-
-Hyper_JS.prototype.remove = function (pos) {
-  var me = this;
-  if (!me.items.length)
-    return me;
-  if (pos === 'first')
-    me.items.shift();
-  if (pos === 'last')
-    me.items.pop();
-  me.updated($(me.list).children()[pos]().remove(), pos, 'remove_' + pos);
-  return me;
-};
-
-Hyper_JS.prototype.trash_where = function (field, new_model) {
-  var me = this;
-  me.el_at(me.find_pos_where('id', new_model)).addClass('trashed');
-  return me;
-};
-
-Hyper_JS.prototype.untrash_where = function (field, new_model) {
-  var me = this;
-  me.el_at(me.find_pos_where('id', new_model)).removeClass('trashed');
-  return me;
-};
 
 Hyper_JS.prototype.el_at = function (pos) {
   return $($(this.list).children()[pos]);
@@ -126,32 +91,23 @@ Hyper_JS.prototype.find_pos_where = function (field, new_model) {
   return pos;
 };
 
-Hyper_JS.prototype.delete_where = function (field, new_model) {
-
+Hyper_JS.prototype.func_for = function (name, func) {
   var me = this;
-  var pos = me.find_pos_where(field, new_model);
-  if (pos === null)
-    return me;
 
-  me.items.splice(pos, 1);
-  me.el_at(pos).remove();
-  return me;
+  if (_.isFunction(func)) {
+    this.funcs[name] = func;
+    return func;
+  }
+
+  return _.compact(_.map(arguments, function (name) {
+    return me.funcs[name];
+  }))[0] || this.funcs.object;
+
 };
 
-Hyper_JS.prototype.update_where = function (field, new_model, type) {
-  var me = this;
-  var pos = me.find_pos_where(field, new_model);
-
-  if (pos === null)
-    return me.prepend(new_model);
-
-  me.items[pos] = new_model;
-
-  me.el_at(pos)
-  .replaceWith(me.func_for(new_model[field], type)(new_model, me));
-
-  return me;
-};
+// ================================================================
+// === create/new
+// ================================================================
 
 Hyper_JS.prototype.prepend = function (o, func, type) {
   return this.into_dom(o, 'prepend', func, type);
@@ -198,6 +154,25 @@ Hyper_JS.prototype.into_dom = function (obj, pos, func, type) {
 };
 
 
+// ================================================================
+// === update
+// ================================================================
+
+Hyper_JS.prototype.update_where = function (field, new_model, type) {
+  var me = this;
+  var pos = me.find_pos_where(field, new_model);
+
+  if (pos === null)
+    return me.prepend(new_model);
+
+  me.items[pos] = new_model;
+
+  me.el_at(pos)
+  .replaceWith(me.func_for(new_model[field], type)(new_model, me));
+
+  return me;
+};
+
 Hyper_JS.prototype.updated = function (ele, pos, name) {
 
   var update = 'update';
@@ -218,6 +193,63 @@ Hyper_JS.prototype.updated = function (ele, pos, name) {
 
   return args;
 };
+
+
+// ================================================================
+// === trash/untrash
+// ================================================================
+
+
+Hyper_JS.prototype.trash_where = function (field, new_model) {
+  var me = this;
+  me.el_at(me.find_pos_where('id', new_model)).addClass('trashed');
+  return me;
+};
+
+Hyper_JS.prototype.untrash_where = function (field, new_model) {
+  var me = this;
+  me.el_at(me.find_pos_where('id', new_model)).removeClass('trashed');
+  return me;
+};
+
+
+// ================================================================
+// === delete/remove
+// ================================================================
+
+Hyper_JS.prototype.shift = function () {
+  return this.remove('first');
+};
+
+Hyper_JS.prototype.pop = function () {
+  return this.remove('last');
+};
+
+Hyper_JS.prototype.remove = function (pos) {
+  var me = this;
+  if (!me.items.length)
+    return me;
+  if (pos === 'first')
+    me.items.shift();
+  if (pos === 'last')
+    me.items.pop();
+  me.updated($(me.list).children()[pos]().remove(), pos, 'remove_' + pos);
+  return me;
+};
+
+Hyper_JS.prototype.delete_where = function (field, new_model) {
+
+  var me = this;
+  var pos = me.find_pos_where(field, new_model);
+  if (pos === null)
+    return me;
+
+  me.items.splice(pos, 1);
+  me.el_at(pos).remove();
+  return me;
+};
+
+
 
 
 
