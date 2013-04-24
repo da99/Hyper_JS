@@ -1,94 +1,32 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Tests for Hyper_JS</title>
-    <style>
-      body { background: #F0F0F0; padding-bottom: 50px; }
-      #results div { padding: 10px ; margin-right: 5px; margin-bottom: 5px; }
-      #results span { font-size: 90%; font-family: monospace; font-weight: bold; }
-      div.passed { background: #CFDB00; float: left; }
-      div.failed { background: #DB0013; float: left; }
-    </style>
+    <title>Tests for...</title>
+    <link rel="stylesheet" type="text/css" href="./mini_dom_test/style.css" />
   </head>
   <body>
 
-    <div id="stage">
-
-      <ul id="list" list="prepend life">
-        <li model="genius">{name}</li>
-      </ul>
-
-      <ul id="list_2nd" list="append life">
-        <li>{name}</li>
-      </ul>
-
-    </div>
+    <div id="stage"></div>
 
     <div id="results" onclick="window.location.reload();"></div>
 
-    <script src="https://raw.github.com/rowanmanning/proclaim/master/lib/proclaim.js"></script>
-    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-    <script src="http://underscorejs.org/underscore-min.js"></script>
-    <script src="http://backbonejs.org/backbone-min.js"></script>
-    <script src="./Hyper_JS.js" type="text/javascript"></script>
-    <script>
+    <script type="text/javascript" src="./mini_dom_test/begin.js"></script>
 
-var results = {pass: 0, fail: 0, error: 0};
-var test_name = null;
-function test (name, func) {
-  test_name = name;
-  try {
-    func();
-  } catch (e) {
-    error(name, e);
-  }
-}
+    <script src="./mini_dom_test/jquery.js"></script>
+    <script src="./mini_dom_test/underscore.js"></script>
+    <script src="./mini_dom_test/backbone.js"></script>
+    <script src="./mini_dom_test/proclaim.js"></script>
 
-function span(txt) {
-  return '<span>' + (txt + '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>';
-}
-function passed(name, exp, act) {
-  results.pass = results.pass + 1;
-  $('#results').append('<div class="passed">' + span(exp) + ' === ' + span(act) + '<br /> ' + name + '</div>');
-}
+    <script type="text/javascript" src="./mini_dom_test/middle.js"></script>
 
-function failed(name, exp, act) {
-  results.fail = results.fail + 1;
-  $('#results').append('<div class="failed">' + span(exp) + ' === ' + span(act) + '<br /> ' + name + '</div>');
-}
 
-function error(name, act) {
-  results.error = results.error + 1;
-  $('#results').append('<div class="failed">' + span(act) + '<br /> ' + name + '</div>');
-}
+    <!-- Insert your tests here. -->
 
-function assert (exp, act, name) {
-  if (exp === act)
-    passed(name || test_name, exp, act);
-  else
-    failed(name || test_name, exp, act)
+    <script type="text/javascript" src="Hyper_JS.js"></script>
+    <script type="text/javascript" src="tests.js"></script>
 
-}
+    <!-- ...................... -->
 
-assert.deepEqual = function (a, b, name) {
-  name = name || test_name;
-  var j_a = JSON.stringify(a);
-  var j_b = JSON.stringify(b);
-  try {
-    proclaim.deepEqual(a, b);
-    passed(name, j_a, j_b);
-  } catch (e) {
-    error(name, j_a + ' !== ' + j_b);
-  }
-};
-
-window.onerror = function (msg, file, line) {
-  error(msg, file + ':' + line);
-}
-
-    </script>
-
-    <script type="text/javascript" src="./tests.js"></script>
 
     <script type="text/javascript">
       if (results.fail || results.error)

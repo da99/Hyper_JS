@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+set -u -e -o pipefail
+
+
+if [[ ! -d mini_dom_test ]]
+then
+  git clone https://github.com/da99/mini_dom_test.git
+else
+  cd mini_dom_test
+  git pull
+fi
+

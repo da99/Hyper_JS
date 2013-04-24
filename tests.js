@@ -1,3 +1,13 @@
+
+$('#stage').html('\
+    <ul id="list">      \
+      <li model="genius">{name}</li> \
+    </ul>               \
+                        \
+    <ul id="list_2nd">  \
+      <li>{name}</li>   \
+    </ul>');
+
 var template = function (o) {
   return "<li>" + o.name + "</li>";
 };
