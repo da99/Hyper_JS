@@ -164,6 +164,11 @@ Hyper_JS.prototype.append = function (o, func, type) {
 Hyper_JS.prototype.into_dom = function (obj, pos, func, type) {
   var me       = this;
 
+  if (_.isString(func)) {
+    type = func;
+    func = null;
+  }
+
   if ($.isArray(obj)) {
     var list = (pos === 'prepend') ? obj.reverse() : obj;
     $(obj).each(function (i, o) { me.into_dom(o, pos, func); });

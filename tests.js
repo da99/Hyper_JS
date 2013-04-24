@@ -6,6 +6,9 @@ $('#stage').html('\
                         \
     <ul id="list_2nd">  \
       <li>{name}</li>   \
+    </ul>               \
+                        \
+    <ul id="list_multi_model"> \
     </ul>');
 
 var template = function (o) {
@@ -188,5 +191,21 @@ test('delete:model removes element from list.items', function () {
   var o_size = list.items.length;
   App.trigger('delete:genius', {id: name});
   assert(o_size - 1, list.items.length);
+});
+
+// === multi-models
+
+test('multi-model: accepts a different function for each model', function () {
+  var list = Hyper_JS.new('#list_multi_model', {genius: function (o) {
+    return "<li>genius: " + o.name + '</li>';
+  },
+  villian : function (o) {
+    return "<li>villian: " + o.name + '</li>';
+  }});
+
+  list.append({id: 1, name: 'Bob'}, 'genius');
+  list.prepend({id: 2, name: 'Bob 2'}, 'villian');
+  assert.deepEqual(['genius: Bob', 'villian: Bob 2'],
+                   [$('#list_multi_model li').last().text(), $('#list_multi_model li').first().text()]);
 });
 
