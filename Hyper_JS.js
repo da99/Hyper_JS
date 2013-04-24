@@ -10,7 +10,7 @@ Hyper_JS.new = function (selector, models, func) {
   o.list     = selector;
   o.items    = [];
   o.models   = [];
-  o.funcs    = {object: func};
+  o.funcs    = {object: (func || function () { return null; })};
 
   o.template = $(selector).html();
 
