@@ -252,8 +252,9 @@ test('delete:model removes element from list', function () {
 
 test('delete:model removes element from list.items', function () {
   var name = "Two_20";
-  var o_size = list.items.length;
   list.prepend({id: name, name: name, job: "two"});
+
+  var o_size = list.items.length;
   App.trigger('delete:genius', {id: name});
   assert(o_size - 1, list.items.length);
 });

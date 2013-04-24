@@ -24,11 +24,17 @@ Hyper_JS.new = function (selector, func) {
       o.update_where('id', new_model);
     });
 
-    Hyper_JS.app().on('trash:' + o.model, function () {});
+    Hyper_JS.app().on('trash:' + o.model, function (new_model) {
+      $(o.find_where('id', new_model)).addClass('trashed');
+    });
 
-    Hyper_JS.app().on('untrash:' + o.model, function () {});
+    Hyper_JS.app().on('untrash:' + o.model, function (new_model) {
+      $(o.find_where('id', new_model)).removeClass('untrashed');
+    });
 
-    Hyper_JS.app().on('delete:' + o.model, function () {});
+    Hyper_JS.app().on('delete:' + o.model, function (new_model) {
+      o.delete_where('id', new_model);
+    });
   }
 
   return o;
@@ -60,19 +66,40 @@ Hyper_JS.prototype.remove = function (pos) {
   return me;
 };
 
-Hyper_JS.prototype.update_where = function (field, new_model) {
-  var pos = -1;
-  var me = this;
+Hyper_JS.prototype.find_where = function (field, new_model) {
+  var me         = this;
+  var target_val = $.isPlainObject(new_model) ? new_model[field] : new_mode;
+  var pos        = -1;
+
   _.find(me.items, function (o, i) {
-    if (o.item[field] === new_model[field]) {
+    if (o.item[field] === target_val)
       pos = i;
-      return true;
-    }
+
+    return pos !== -1;
   });
 
-  if (pos < 0) {
+  return pos;
+};
+
+Hyper_JS.prototype.delete_where = function (field, new_model) {
+
+  var me = this;
+  var pos = me.find_where(field, new_model);
+
+  if (pos < 0)
+    return me;
+
+  me.items.splice(pos, 1);
+  $($(me.list).children()[pos]).remove();
+  return me;
+};
+
+Hyper_JS.prototype.update_where = function (field, new_model) {
+  var me = this;
+  var pos = me.find_where(field, new_model);
+
+  if (pos < 0)
     return me.prepend(new_model);
-  }
 
   me.items[pos].item = new_model;
   var ele = $($(me.list).children()[pos]);
