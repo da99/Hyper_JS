@@ -209,3 +209,16 @@ test('multi-model: accepts a different function for each model', function () {
                    [$('#list_multi_model li').last().text(), $('#list_multi_model li').first().text()]);
 });
 
+test('multi-model: adds events for each model', function () {
+  var list = Hyper_JS.new(null, { mod_1: function (o) {}, mod_2 : function (o) { }});
+  var actual = _.filter(_.keys(App.events_map), function (name) { return name.indexOf('mod_') > -1; });
+  var target = [];
+  _.each(['mod_1', 'mod_2'], function (mod) {
+    _.each('new update trash untrash delete'.split(' '), function (e) {
+      target.push(e+':'+mod);
+    });
+  });
+
+  assert.deepEqual(target, actual);
+});
+
