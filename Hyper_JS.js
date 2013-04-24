@@ -1,6 +1,5 @@
 "use strict";
 
-// function error(name, e) { throw e;}
 
 // ================================================================
 // === Main Stuff
@@ -40,7 +39,7 @@ Hyper_JS.new = function (selector, models, func) {
 
 
   if (_.isFunction(func))
-    o.func.object = func;
+    o.funcs.object = func;
 
   if (selector) {
     o.template = $(selector).html();
@@ -61,7 +60,7 @@ Hyper_JS.new = function (selector, models, func) {
   if (Hyper_JS.app()) {
     _.each(o.models, function ( name, i ) {
       Hyper_JS.app().on('new:' + name, function (new_model) {
-        o.prepend(new_model, name);
+        o.insert(new_model, name);
       });
 
       Hyper_JS.app().on('update:' + name, function (new_model) {
@@ -151,8 +150,8 @@ Hyper_JS.prototype.insert = function (obj, func) {
     throw new Error("Not ready to handle positiong: " + pos);
 
   (pos === 'top') ?
-    me.items.unshift(obj) :
-    me.items.push(obj);
+    me.items.unshift(item) :
+    me.items.push(item);
 
   if (!ele)
     return me;
@@ -207,30 +206,6 @@ Hyper_JS.prototype.untrash_where = function (field, new_model) {
 // ================================================================
 // === delete/remove
 // ================================================================
-
-Hyper_JS.prototype.shift = function () {
-  return this.remove('first');
-};
-
-Hyper_JS.prototype.pop = function () {
-  return this.remove('last');
-};
-
-Hyper_JS.prototype.remove = function (pos) {
-  var me = this;
-
-  if (!me.items.length)
-    return me;
-  if (pos === 'first')
-    me.items.shift();
-  else if (pos === 'last')
-    me.items.pop();
-
-  if (pos === 'first' || pos === 'last')
-    $(me.list).children()[pos]().remove();
-
-  return me;
-};
 
 Hyper_JS.prototype.delete_where = function (field, new_model) {
 
