@@ -78,7 +78,7 @@ window.onerror = function (msg, file, line) {
 }
 
 var template = function (o) {
-  return "<li>" + o.obj.name + "</li>";
+  return "<li>" + o.name + "</li>";
 };
 
 var App = {
@@ -227,8 +227,10 @@ test('new:model prepends model to list', function () {
 });
 
 test('update:model updates model', function () {
-  App.trigger('update:genius', {id: 'one', name: 'Dos', job: 'num'});
-  assert('Dos', $('#list li').first().text());
+  var name = "update_dos";
+  list.append({id: name, name: name, job: "being 2"});
+  App.trigger('update:genius', {id: name, name: name + 'updated', job: 'num'});
+  assert(name+'updated', $('#list li').last().text());
 });
 
 test('trash:model adds class "trashed"', function () {

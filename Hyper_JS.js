@@ -20,7 +20,9 @@ Hyper_JS.new = function (selector, func) {
       o.prepend(new_model);
     });
 
-    Hyper_JS.app().on('update:' + o.model, function () {});
+    Hyper_JS.app().on('update:' + o.model, function (new_model) {
+      o.update_where('id', new_model);
+    });
 
     Hyper_JS.app().on('trash:' + o.model, function () {});
 
@@ -57,6 +59,27 @@ Hyper_JS.prototype.remove = function (pos) {
   me.updated($(me.list).children()[pos]().remove(), pos, 'remove_' + pos);
   return me;
 };
+
+Hyper_JS.prototype.update_where = function (field, new_model) {
+  var pos = -1;
+  var me = this;
+  _.find(me.items, function (o, i) {
+    if (o.item[field] === new_model[field]) {
+      pos = i;
+      return true;
+    }
+  });
+
+  if (pos < 0) {
+    return me.prepend(new_model);
+  }
+
+  me.items[pos].item = new_model;
+  var ele = $($(me.list).children()[pos]);
+  ele.replaceWith(me.items[pos].func(me.items[pos].item, me));
+  return me;
+};
+
 Hyper_JS.prototype.prepend = function (o, func) {
   return this.into_dom(o, 'prepend', func);
 };
@@ -75,7 +98,7 @@ Hyper_JS.prototype.into_dom = function (obj, pos, func) {
   }
 
   func         = func || me.func;
-  var ele      = $(func({obj: obj, Hyper_JS: me}));
+  var ele      = $(func(obj, me));
   var item     = {item: obj, func: func};
   var was_empty= $(me.list).children().length === 0;
 
