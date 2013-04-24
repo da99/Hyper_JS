@@ -68,34 +68,30 @@ Hyper_JS.prototype.remove = function (pos) {
 
 Hyper_JS.prototype.trash_where = function (field, new_model) {
   var me = this;
-  var pos = me.find_where('id', new_model);
-  if (pos < 0)
-    return me;
-
-  $($(me.list).children()[pos]).addClass('trashed');
+  me.el_at(me.find_pos_where('id', new_model)).addClass('trashed');
   return me;
 };
 
 Hyper_JS.prototype.untrash_where = function (field, new_model) {
   var me = this;
-  var pos = me.find_where('id', new_model);
-  if (pos < 0)
-    return me;
-
-  $($(me.list).children()[pos]).removeClass('trashed');
+  me.el_at(me.find_pos_where('id', new_model)).removeClass('trashed');
   return me;
 };
 
-Hyper_JS.prototype.find_where = function (field, new_model) {
+Hyper_JS.prototype.el_at = function (pos) {
+  return $($(this.list).children()[pos]);
+};
+
+Hyper_JS.prototype.find_pos_where = function (field, new_model) {
   var me         = this;
   var target_val = $.isPlainObject(new_model) ? new_model[field] : new_mode;
-  var pos        = -1;
+  var pos        = null;
 
   _.find(me.items, function (o, i) {
     if (o.item[field] === target_val)
       pos = i;
 
-    return pos !== -1;
+    return pos !== null;
   });
 
   return pos;
@@ -104,26 +100,28 @@ Hyper_JS.prototype.find_where = function (field, new_model) {
 Hyper_JS.prototype.delete_where = function (field, new_model) {
 
   var me = this;
-  var pos = me.find_where(field, new_model);
-
-  if (pos < 0)
+  var pos = me.find_pos_where(field, new_model);
+  if (pos === null)
     return me;
 
   me.items.splice(pos, 1);
-  $($(me.list).children()[pos]).remove();
+  me.el_at(pos).remove();
   return me;
 };
 
 Hyper_JS.prototype.update_where = function (field, new_model) {
   var me = this;
-  var pos = me.find_where(field, new_model);
+  var pos = me.find_pos_where(field, new_model);
 
-  if (pos < 0)
+  if (pos === null)
     return me.prepend(new_model);
 
-  me.items[pos].item = new_model;
-  var ele = $($(me.list).children()[pos]);
-  ele.replaceWith(me.items[pos].func(me.items[pos].item, me));
+  var meta = me.items[pos];
+  meta.item = new_model;
+
+  me.el_at(pos)
+  .replaceWith(meta.func(new_model, me));
+
   return me;
 };
 

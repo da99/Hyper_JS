@@ -27,7 +27,7 @@
     <script src="http://backbonejs.org/backbone-min.js"></script>
     <script src="./Hyper_JS.js" type="text/javascript"></script>
     <script>
-
+var results = {pass: 0, fail: 0, error: 0};
 var test_name = null;
 function test (name, func) {
   test_name = name;
@@ -42,14 +42,17 @@ function span(txt) {
   return '<span>' + (txt + '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>';
 }
 function passed(name, exp, act) {
+  results.pass = results.pass + 1;
   $('#results').append('<div class="passed">' + span(exp) + ' === ' + span(act) + '<br /> ' + name + '</div>');
 }
 
 function failed(name, exp, act) {
+  results.fail = results.fail + 1;
   $('#results').append('<div class="failed">' + span(exp) + ' === ' + span(act) + '<br /> ' + name + '</div>');
 }
 
 function error(name, act) {
+  results.error = results.error + 1;
   $('#results').append('<div class="failed">' + span(act) + '<br /> ' + name + '</div>');
 }
 
@@ -259,7 +262,10 @@ test('delete:model removes element from list.items', function () {
   assert(o_size - 1, list.items.length);
 });
 
-
+if (results.fail || results.error)
+  console.log(results);
+else if (results.pass > 0)
+  console.log("ALL PASS.");
     </script>
 <!-- setTimeout(function () { window.location.reload(); }, 1000); -->
   </body>
