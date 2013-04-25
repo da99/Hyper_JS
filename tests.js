@@ -15,6 +15,14 @@ var template = function (o) {
   return "<li>" + o.name + "</li>";
 };
 
+var _last_id_ = 0;
+
+function last_id() { return 'o_' + _last_id_; }
+function new_id() {
+  _last_id_ = parseInt(last_id().replace('o_', ''), 10) + 1;
+  return last_id();
+}
+
 var App = {
   events : [],
   events_map : {},
@@ -81,24 +89,27 @@ test('new:model prepends model to list', function () {
 
 test('update:model updates model', function () {
   var name = "update_dos";
-  list.insert({id: name, name: name, job: "being 2"});
+  App.trigger('new:genius', {id: name, name: name, job: "being 2"});
   App.trigger('update:genius', {id: name, name: name + 'updated', job: 'num'});
-  assert(name+'updated', $('#list li').last().text());
+  assert(name+'updated', $('#list li').first().text());
 });
 
 test('trash:model adds class "trashed"', function () {
-  App.trigger('trash:genius', {id: 'one'});
+  App.trigger('new:genius', {id: new_id(), name: last_id(), job: last_id()});
+  App.trigger('trash:genius', {id: last_id()});
   assert('trashed', $('#list li').first().attr('class'));
 });
 
 test('untrash:model removes class "trashed"', function () {
-  App.trigger('untrash:genius', {id: 'one'});
+  App.trigger('new:genius', {id: new_id(), name: last_id(), job: last_id()});
+  App.trigger('trash:genius', {id: last_id()});
+  App.trigger('untrash:genius', {id: last_id()});
   assert('', $('#list li').first().attr('class'));
 });
 
 test('delete:model removes element from list', function () {
-  var name = "Two_2456";
-  list.insert({id: name, name: name, job: "two"});
+  var name = "delete_" + new_id();
+  App.trigger('new:genius', {id: name, name: name, job: "two"});
   App.trigger('delete:genius', {id: name});
   assert(0, $('#list li').filter(function () { return $(this).text() === name; }).length);
 });
@@ -122,8 +133,8 @@ test('multi-model: accepts a different function for each model', function () {
     return "<li>villian: " + o.name + '</li>';
   }});
 
-  list.insert({id: 2, name: 'Bob 2'}, 'villian');
-  list.insert({id: 1, name: 'Bob'}, 'genius');
+  App.trigger('new:genius', {id: 1, name: 'Bob'});
+  App.trigger('new:villian', {id: 2, name: 'Bob 2'});
   assert.deepEqual(['genius: Bob', 'villian: Bob 2'],
                    [$('#list_multi_model li').last().text(), $('#list_multi_model li').first().text()]);
 });
