@@ -202,7 +202,26 @@ test('sorting: sorts (private) .items', function () {
 });
 
 
+test('sorting: accepts a cusotm sort function', function () {
+  $('#list_sort').empty();
 
+  var ids = _.map([0,1,2], function (num) {
+    return 'animal_' + num;
+  });
+
+  var list = Hyper_JS.new('#list_sort', 'animal', function (o) { return '<li>' + o.name + '</li>'});
+  App.trigger('new:animal', {id: ids[2], name: ids[2]});
+  App.trigger('new:animal', {id: ids[0], name: ids[0]});
+  App.trigger('new:animal', {id: ids[1], name: ids[1]});
+
+  list.sort(function (a, b) {
+    return a.id < b.id;
+  });
+
+  var exp = ids.reverse();
+  var actual = _.map($('#list_sort li'), function (o) { return $(o).text(); });
+  assert.deepEqual(exp, actual);
+});
 
 
 

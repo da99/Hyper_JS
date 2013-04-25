@@ -118,15 +118,17 @@ Hyper_JS.prototype.func_at = function (pos) {
   return me.items[pos].func;
 };
 
-Hyper_JS.prototype.sort = function () {
+Hyper_JS.prototype.sort = function (func) {
   var me = this;
   var els = $(me.list).children();
   var list = _.map(me.items, function (o, i) {
     return [i, o, $(els[i]).detach()];
   });
+
   var sorted = list.sort(function (a, b) {
-    return Hyper_JS.default_sort_func(a[1].data,  b[1].data);
+    return (func || Hyper_JS.default_sort_func)(a[1].data,  b[1].data);
   });
+
   _.each(sorted, function (entry) {
     me.items.shift();
     me.items.push(entry[1]);
