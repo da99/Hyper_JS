@@ -12,7 +12,7 @@ _.extend(Hyper_JS, Backbone.Events);
 
 Hyper_JS.default_func = function (o) { return null; };
 
-Hyper_JS.default_sort_func = function (a, b) {
+Hyper_JS.sort_func = function (a, b) {
   return a.id > b.id;
 };
 
@@ -93,7 +93,6 @@ Hyper_JS.new = function (selector, models, func) {
 // === meta/find stuff
 // ================================================================
 
-
 Hyper_JS.prototype.el_at = function (pos) {
   return $($(this.list).children()[pos]);
 };
@@ -119,17 +118,18 @@ Hyper_JS.prototype.func_at = function (pos) {
 };
 
 Hyper_JS.prototype.sort = function (func) {
-  var me = this;
-  var els = $(me.list).children();
-  var list = _.map(me.items, function (o, i) {
+  var me       = this;
+  me.sort_func = (func || Hyper_JS.sort_func);
+  var els      = $(me.list).children();
+  var list     = _.map(me.items, function (o, i) {
     return [i, o, $(els[i]).detach()];
   });
 
-  var sorted = list.sort(function (a, b) {
-    return (func || Hyper_JS.default_sort_func)(a[1].data,  b[1].data);
+  list.sort(function (a, b) {
+    return me.sort_func(a[1].data,  b[1].data);
   });
 
-  _.each(sorted, function (entry) {
+  _.each(list, function (entry) {
     me.items.shift();
     me.items.push(entry[1]);
     $(me.list).append(entry[2]);
@@ -149,7 +149,7 @@ Hyper_JS.prototype.insert = function (obj, func) {
   }
 
   var item = {data: obj};
-  var pos  = 'top';
+  var pos  = null;
 
   if (_.isString(func)) {
     item.model = func;
@@ -169,19 +169,38 @@ Hyper_JS.prototype.insert = function (obj, func) {
     ele = ele[1];
   }
 
-  if ( !_.contains(['top', 'bottom'], pos) )
-    throw new Error("Not ready to handle positiong: " + pos);
+  if (!_.isNumber(pos) && me.sort_func) {
+    var new_list = _.pluck(me.items, 'data');
+    new_list.push(item.data);
+    new_list.sort( me.sort_func );
+    pos = new_list.indexOf(item.data);
+  }
 
-  (pos === 'top') ?
-    me.items.unshift(item) :
-    me.items.push(item);
+  if (pos === 'top' || !_.isNumber(pos) || _.isNaN(pos))
+    pos = 0;
+  if (pos === 'bottom')
+    pos = me.items.length;
+
+  var prev = me.items[pos];
+
+
+  if (prev) {
+    me.items.splice(pos, 0, item);
+  } else {
+    me.items[pos] = item;
+  }
 
   if (!ele)
     return me;
 
   ele = $(ele);
 
-  $(me.list)[(pos === 'top') ? 'prepend' : 'append'](ele);
+  var prev = $(me.list).children()[pos];
+  if (prev) {
+    $(prev).before(ele);
+  } else {
+    $(me.list).append(ele);
+  }
 
   return me;
 };

@@ -176,9 +176,9 @@ test('sorting: by default, sorts by id', function () {
 
   list.sort();
 
-  var exp = ids.join('');
-  var actual = $('#list_sort li').text();
-  assert(exp, actual);
+  var exp = ids;
+  var actual = _.map($('#list_sort li'), function (o) { return $(o).text(); });
+  assert.deepEqual(exp, actual);
 });
 
 
@@ -223,7 +223,28 @@ test('sorting: accepts a cusotm sort function', function () {
   assert.deepEqual(exp, actual);
 });
 
+test('sorting: sorts new elements after sort is applied', function () {
+  $('#list_sort').empty();
 
+  var ids = _.map([0,1,2,3], function (num) {
+    return 'animal_' + num;
+  });
+
+  var list = Hyper_JS.new('#list_sort', 'animal', function (o) { return '<li>' + o.name + '</li>'});
+  App.trigger('new:animal', {id: ids[2], name: ids[2]});
+  App.trigger('new:animal', {id: ids[0], name: ids[0]});
+  App.trigger('new:animal', {id: ids[3], name: ids[3]});
+
+  list.sort(function (a, b) {
+    return a.id < b.id;
+  });
+
+  App.trigger('new:animal', {id: ids[1], name: ids[1]});
+
+  var exp = ids.reverse();
+  var actual = _.map($('#list_sort li'), function (o) { return $(o).text(); });
+  assert.deepEqual(exp, actual);
+});
 
 
 
