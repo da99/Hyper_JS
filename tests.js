@@ -9,6 +9,9 @@ $('#stage').html('\
     </ul>               \
                         \
     <ul id="list_multi_model"> \
+    </ul>               \
+                        \
+    <ul id="list_sort"> \
     </ul>');
 
 var template = function (o) {
@@ -140,7 +143,7 @@ test('multi-model: accepts a different function for each model', function () {
 });
 
 test('multi-model: adds events for each model', function () {
-  var list = Hyper_JS.new(null, { mod_1: function (o) {}, mod_2 : function (o) { }});
+  var list = Hyper_JS.new({ mod_1: function (o) {}, mod_2 : function (o) { }});
   var actual = _.filter(_.keys(App.events_map), function (name) { return name.indexOf('mod_') > -1; });
   var target = [];
   _.each(['mod_1', 'mod_2'], function (mod) {
@@ -151,4 +154,86 @@ test('multi-model: adds events for each model', function () {
 
   assert.deepEqual(target, actual);
 });
+
+
+// ================================================================
+// ==== sorting
+// ================================================================
+
+
+test('sorting: by default, sorts by id', function () {
+  $('#list_sort').empty();
+
+  var ids = _.map([0,1,2,3], function (num) {
+    return 'animal_' + num;
+  });
+
+  var list = Hyper_JS.new('#list_sort', 'animal', function (o) { return '<li>' + o.name + '</li>'});
+  App.trigger('new:animal', {id: ids[2], name: ids[2]});
+  App.trigger('new:animal', {id: ids[1], name: ids[1]});
+  App.trigger('new:animal', {id: ids[3], name: ids[3]});
+  App.trigger('new:animal', {id: ids[0], name: ids[0]});
+
+  list.sort();
+
+  var exp = ids.join('');
+  var actual = $('#list_sort li').text();
+  assert(exp, actual);
+});
+
+
+test('sorting: sorts (private) .items', function () {
+  $('#list_sort').empty();
+
+  var ids = _.map([0,1,2], function (num) {
+    return 'animal_' + num;
+  });
+
+  var list = Hyper_JS.new('#list_sort', 'animal', function (o) { return '<li>' + o.name + '</li>'});
+  App.trigger('new:animal', {id: ids[2], name: ids[2]});
+  App.trigger('new:animal', {id: ids[1], name: ids[1]});
+  App.trigger('new:animal', {id: ids[0], name: ids[0]});
+
+  list.sort();
+
+  var exp = ids;
+  var actual = _.pluck(_.pluck(list.items, 'data'), 'id');
+  assert.deepEqual(exp, actual);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

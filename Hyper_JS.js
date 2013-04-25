@@ -12,6 +12,10 @@ _.extend(Hyper_JS, Backbone.Events);
 
 Hyper_JS.default_func = function (o) { return null; };
 
+Hyper_JS.default_sort_func = function (a, b) {
+  return a.id > b.id;
+};
+
 Hyper_JS.app = function (app) {
   if (arguments.length)
     this._app_ = app;
@@ -112,6 +116,23 @@ Hyper_JS.prototype.item_where = function (field, new_model) {
 Hyper_JS.prototype.func_at = function (pos) {
   var me = this;
   return me.items[pos].func;
+};
+
+Hyper_JS.prototype.sort = function () {
+  var me = this;
+  var els = $(me.list).children();
+  var list = _.map(me.items, function (o, i) {
+    return [i, o, $(els[i]).detach()];
+  });
+  var sorted = list.sort(function (a, b) {
+    return Hyper_JS.default_sort_func(a[1].data,  b[1].data);
+  });
+  _.each(sorted, function (entry) {
+    me.items.shift();
+    me.items.push(entry[1]);
+    $(me.list).append(entry[2]);
+  });
+  return me;
 };
 
 // ================================================================
